@@ -5,6 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import model.items.*;
+import model.items.tools.Staff;
+import model.items.weapons.Axe;
+import model.items.weapons.Bow;
+import model.items.weapons.Spear;
+import model.items.weapons.Sword;
 import model.map.Field;
 import model.map.Location;
 import org.junit.jupiter.api.BeforeEach;

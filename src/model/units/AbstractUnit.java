@@ -5,6 +5,8 @@ import static java.lang.Math.min;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import model.combat.Combat;
 import model.items.IEquipableItem;
 import model.map.Location;
 
@@ -21,7 +23,8 @@ import model.map.Location;
 public abstract class AbstractUnit implements IUnit {
 
   protected final List<IEquipableItem> items = new ArrayList<>();
-  private final int currentHitPoints;
+  private final int maxHitPoints;
+  private int currentHitPoints;
   private final int movement;
   protected IEquipableItem equippedItem;
   private Location location;
@@ -41,15 +44,27 @@ public abstract class AbstractUnit implements IUnit {
   protected AbstractUnit(final int hitPoints, final int movement,
       final Location location, final int maxItems, final IEquipableItem... items) {
     this.currentHitPoints = hitPoints;
+    this.maxHitPoints = hitPoints;
     this.movement = movement;
     this.location = location;
     this.items.addAll(Arrays.asList(items).subList(0, min(maxItems, items.length)));
   }
 
   @Override
+  public int getMaxHitPoints() {
+    return maxHitPoints;
+  }
+
+  @Override
   public int getCurrentHitPoints() {
     return currentHitPoints;
   }
+
+  @Override
+  public boolean isAlive() { return currentHitPoints > 0; }
+
+  @Override
+  public void setHitPoints(int hitPoints) { this.currentHitPoints = hitPoints; }
 
   @Override
   public List<IEquipableItem> getItems() {
@@ -87,5 +102,11 @@ public abstract class AbstractUnit implements IUnit {
         && targetLocation.getUnit() == null) {
       setLocation(targetLocation);
     }
+  }
+
+  @Override
+  public void combatUnit(IUnit victim) {
+    Combat combat = new Combat(this, victim);
+    combat.doCombat();
   }
 }

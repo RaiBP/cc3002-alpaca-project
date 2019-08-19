@@ -2,6 +2,11 @@ package model.units;
 
 
 import model.items.*;
+import model.items.tools.Staff;
+import model.items.weapons.Axe;
+import model.items.weapons.Bow;
+import model.items.weapons.Spear;
+import model.items.weapons.Sword;
 import model.map.Field;
 import org.junit.jupiter.api.Test;
 

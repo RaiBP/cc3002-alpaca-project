@@ -1,10 +1,10 @@
-package model.items;
+package model.items.weapons;
 
 /**
  * @author Ignacio Slater Muñoz
  * @since
  */
-public class Bow extends AbstractItem {
+public class Bow extends AbstractWeapon {
 
   /**
    * Creates a new bow.
@@ -22,7 +22,7 @@ public class Bow extends AbstractItem {
    *     the maximum range of the bow
    */
   public Bow(final String name, final int power, final int minRange, final int maxRange) {
-    super(name, power, minRange, maxRange);
+    super(name, power, minRange, maxRange, "Bow");
     this.minRange = Math.max(minRange, 2);
     this.maxRange = Math.max(maxRange, this.minRange);
   }

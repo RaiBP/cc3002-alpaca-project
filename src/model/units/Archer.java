@@ -1,6 +1,6 @@
 package model.units;
 
-import model.items.Bow;
+import model.items.weapons.Bow;
 import model.items.IEquipableItem;
 import model.map.Location;
 
@@ -15,7 +15,7 @@ import model.map.Location;
 public class Archer extends AbstractUnit {
 
   /**
-   * Creates a new archer
+   * Creates a new Archer unit.
    *
    * @param hitPoints
    *     maximum hit points of the unit

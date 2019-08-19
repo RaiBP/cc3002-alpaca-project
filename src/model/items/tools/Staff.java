@@ -1,14 +1,14 @@
-package model.items;
+package model.items.tools;
 
 /**
  * This class represents a <i>Staff</i> type item.
  * <p>
- * A staff is an item that can heal other units nut cannot counter any attack
+ * A staff is an item that can heal other units but cannot counter any attack
  *
  * @author Ignacio Slater Muñoz
  * @since 1.0
  */
-public class Staff extends AbstractItem {
+public class Staff extends AbstractTool {
 
   /**
    * Creates a new Staff item.

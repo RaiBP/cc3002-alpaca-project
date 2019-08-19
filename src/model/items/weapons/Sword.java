@@ -1,4 +1,4 @@
-package model.items;
+package model.items.weapons;
 
 /**
  * This class represents a sword type item.
@@ -8,7 +8,7 @@ package model.items;
  * @author Ignacio Slater Muñoz
  * @since 1.0
  */
-public class Sword extends AbstractItem {
+public class Sword extends AbstractWeapon {
 
   /**
    * Creates a new Sword.
@@ -23,6 +23,17 @@ public class Sword extends AbstractItem {
    *     the maximum range of the weapon
    */
   public Sword(final String name, final int power, final int minRange, final int maxRange) {
-    super(name, power, minRange, maxRange);
+    super(name, power, minRange, maxRange, "Sword");
   }
+
+  @Override
+  public String getWeakness() {
+    return "Spear";
+  }
+
+  @Override
+  public String getStrength() {
+    return "Axe";
+  }
+
 }

@@ -24,14 +24,30 @@ public interface IUnit {
   void equipItem(IEquipableItem item);
 
   /**
-   * @return hit points of the unit
+   * @return maximum hit points of the unit
+   */
+  int getMaxHitPoints();
+
+  /**
+   * @return current hit points of the unit
    */
   int getCurrentHitPoints();
+
+  /**
+   * @return whether unit is alive or not
+   */
+  boolean isAlive();
 
   /**
    * @return the items carried by this unit
    */
   List<IEquipableItem> getItems();
+
+  /**
+   * @param hitPoints
+   *     set hitPoints for this unit
+   */
+  void setHitPoints(int hitPoints);
 
   /**
    * @return the currently equipped item
@@ -65,4 +81,11 @@ public interface IUnit {
    * If the other location is out of this unit's movement range, the unit doesn't move.
    */
   void moveTo(Location targetLocation);
+
+  /**
+   * Combats other unit.
+   * <p>
+   * Units in combat attack each other until one or the other is dead.
+   */
+  void combatUnit(IUnit victim);
 }

@@ -1,5 +1,6 @@
 package model.units;
 
+import model.items.weapons.Sword;
 import model.items.IEquipableItem;
 import model.map.Location;
 
@@ -12,7 +13,18 @@ import model.map.Location;
  * @since 1.0
  */
 public class SwordMaster extends AbstractUnit {
-
+  /**
+   * Creates a new SwordMaster unit.
+   *
+   * @param hitPoints
+   *     maximum hit points of the unit
+   * @param movement
+   *     the amount of cells this unit can move
+   * @param location
+   *     the initial position of this unit
+   * @param items
+   *     the items carried by this unit
+   */
   public SwordMaster(final int hitPoints, final int movement, final Location location,
       IEquipableItem... items) {
     super(hitPoints, movement, location, 3, items);
@@ -26,7 +38,7 @@ public class SwordMaster extends AbstractUnit {
    */
   @Override
   public void equipItem(final IEquipableItem item) {
-    if (item instanceof SwordMaster) {
+    if (item instanceof Sword) {
       equippedItem = item;
     }
   }

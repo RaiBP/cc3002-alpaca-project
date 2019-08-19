@@ -3,6 +3,7 @@ package model.map;
 import java.util.HashSet;
 import java.util.Set;
 import model.units.IUnit;
+import org.jetbrains.annotations.Contract;
 
 /**
  * This class represents a <i>location</i> in the game's map.
@@ -51,6 +52,7 @@ public class Location {
    *     the object to compare this location to
    * @return <code>true</code> if the id's match; <code>false</code> otherwise
    */
+
   @Override
   public boolean equals(final Object other) {
     return other instanceof Location && row == ((Location) other).row
