@@ -1,7 +1,6 @@
 package model.units;
 
 import model.items.IEquipableItem;
-import model.items.magic.ISpell;
 import model.map.Location;
 
 /**
@@ -39,9 +38,14 @@ public class Sorcerer extends AbstractUnit {
      *     the item to equip
      */
     @Override
-    public void equipItem(final IEquipableItem item) {
-        if (item instanceof ISpell) {
-            equippedItem = item;
+    public void equipItem(IEquipableItem item) {
+        if (!(getItems().contains(item))) {
+            if (addItemToInventory(item)) {
+                item.equipOnSorcerer(this);
+            }
+        }
+        else {
+            item.equipOnSorcerer(this);
         }
     }
 

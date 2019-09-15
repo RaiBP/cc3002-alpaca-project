@@ -1,5 +1,7 @@
 package model.items.magic;
 
+import model.units.*;
+
 /**
  * This class represents an Dark spell.
  * <p>
@@ -23,17 +25,20 @@ public class Dark extends AbstractSpell {
      *     the maximum range of the Dark spell
      */
     public Dark(final String name, final int power, final int minRange, final int maxRange) {
-        super(name, power, minRange, maxRange, "Dark");
+        super(name, power, minRange, maxRange);
     }
 
     @Override
-    public String getWeakness() {
-        return "Light";
+    protected int attack(IUnit targetUnit) { return targetUnit.receiveDarkSpellAttack(this);
     }
 
     @Override
-    public String getStrength() {
-        return "Anima";
-    }
+    protected int receiveDarkSpellAttack(Dark dark) { return dark.getPower(); }
+
+    @Override
+    protected int receiveLightSpellAttack(Light light) { return (int) (1.5 * light.getPower()); }
+
+    @Override
+    protected int receiveAnimaSpellAttack(Anima anima) { return Math.max(0, anima.getPower() - 20); }
 
 }

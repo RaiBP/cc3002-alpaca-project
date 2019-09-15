@@ -1,7 +1,12 @@
 package model.units;
 
 import model.items.IEquipableItem;
+import model.items.magic.Anima;
+import model.items.magic.Dark;
+import model.items.magic.Light;
+import model.items.weapons.Axe;
 import model.items.weapons.Spear;
+import model.items.weapons.Sword;
 import model.map.Location;
 
 /**
@@ -9,7 +14,7 @@ import model.map.Location;
  * <p>
  * This unit <b>can only use spear weapons</b>.
  *
- * @author Ignacio Slater Muñoz
+ * @author  Raimundo Becerra Parra
  * @since 1.0
  */
 public class Hero extends AbstractUnit {
@@ -38,9 +43,14 @@ public class Hero extends AbstractUnit {
    *     the item to equip
    */
   @Override
-  public void equipItem(final IEquipableItem item) {
-    if (item instanceof Spear) {
-      equippedItem = item;
+  public void equipItem(IEquipableItem item) {
+    if (!(getItems().contains(item))) {
+      if (addItemToInventory(item)) {
+        item.equipOnHero(this);
+      }
+    }
+    else {
+      item.equipOnHero(this);
     }
   }
 }

@@ -1,6 +1,5 @@
 package model.units;
 
-import model.items.weapons.Sword;
 import model.items.IEquipableItem;
 import model.map.Location;
 
@@ -9,7 +8,7 @@ import model.map.Location;
  * <p>
  * A <i>SwordMaster</i> is a unit that <b>can only use sword type weapons</b>.
  *
- * @author Ignacio Slater Muñoz
+ * @author Raimundo Becerra Parra
  * @since 1.0
  */
 public class SwordMaster extends AbstractUnit {
@@ -37,9 +36,15 @@ public class SwordMaster extends AbstractUnit {
    *     the item to equip
    */
   @Override
-  public void equipItem(final IEquipableItem item) {
-    if (item instanceof Sword) {
-      equippedItem = item;
+  public void equipItem(IEquipableItem item) {
+    if (!(getItems().contains(item))) {
+      if (addItemToInventory(item)) {
+        item.equipOnSwordMaster(this);
+      }
+    }
+    else {
+      item.equipOnSwordMaster(this);
     }
   }
+
 }

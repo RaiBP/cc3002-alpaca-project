@@ -1,5 +1,7 @@
 package model.items.weapons;
 
+import model.units.*;
+
 /**
  * This class represents an Axe.
  * <p>
@@ -23,17 +25,42 @@ public class Axe extends AbstractWeapon {
    *     the maximum range of the Axe
    */
   public Axe(final String name, final int power, final int minRange, final int maxRange) {
-    super(name, power, minRange, maxRange, "Axe");
+    super(name, power, minRange, maxRange);
   }
 
   @Override
-  public String getWeakness() {
-    return "Sword";
+  protected int attack(IUnit targetUnit) {
+    return targetUnit.receiveAxeAttack(this);
   }
 
   @Override
-  public String getStrength() {
-    return "Spear";
+  protected int receiveAxeAttack(Axe axe) {
+    return axe.getPower();
   }
+
+  @Override
+  protected int receiveSpearAttack(Spear spear) {
+    return Math.max(0, spear.getPower() - 20);
+  }
+
+  @Override
+  protected int receiveSwordAttack(Sword sword) {
+    return (int) (1.5 * sword.getPower());
+  }
+
+  @Override
+  public void equipOnSwordMaster(SwordMaster swordMaster) { }
+
+  @Override
+  public void equipOnArcher(Archer archer) { }
+
+  @Override
+  public void equipOnCleric(Cleric cleric) { }
+
+  @Override
+  public void equipOnFighter(Fighter fighter) { fighter.setEquippedItem(this); }
+
+  @Override
+  public void equipOnHero(Hero hero) { }
 
 }

@@ -1,9 +1,9 @@
 package model.units;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
+import model.items.IEquipableItem;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test set for the Archer unit.
@@ -14,6 +14,17 @@ import org.junit.jupiter.api.Test;
 public class ArcherTest extends AbstractTestUnit {
 
   private Archer archer;
+
+  @Test
+  public void testEquipFullInventory() {
+    getTestUnit().addItemToInventory(spear);
+    getTestUnit().addItemToInventory(axe);
+    getTestUnit().addItemToInventory(bow);
+    getTestUnit().addItemToInventory(sword);
+
+    assertArrayEquals(new IEquipableItem[] {spear, axe, bow},
+            getTestUnit().getItems().toArray(new IEquipableItem[0]));
+  }
 
   /**
    * Set up the main unit that's going to be tested in the test set
