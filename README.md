@@ -1,5 +1,5 @@
 # CC3002 Alpaca Project
-Repository for Alpaca Project, CC3002 Programming and Design Methodologies class, Spring 2019, FCFM 
+Repository for Alpaca Project, CC3002 Programming and Design Methodologies class, Spring 2019, FCFM, Universidad de Chile.
 
 ## Project Structure
 There are three packages: items, map and units. The map package wasn't modified from the initial version so the package won't be discussed for now. 
