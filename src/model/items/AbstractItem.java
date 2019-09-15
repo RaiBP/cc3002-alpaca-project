@@ -146,6 +146,10 @@ public abstract class AbstractItem implements IEquipableItem {
   @Override
   public int getDamageFromSwordAttack(Sword sword) { return receiveSwordAttack(sword); }
 
+
+  /**
+   * Two objects can be equal regardless of their ownership
+   */
   @Override
   public boolean equals(Object object){
     if (object instanceof AbstractItem) {

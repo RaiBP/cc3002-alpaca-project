@@ -3,6 +3,8 @@ package model.units;
 import model.items.IEquipableItem;
 import model.map.Location;
 
+import java.util.List;
+
 /**
  * This class represents an <i>Archer</i> type unit.
  * <p>
@@ -40,8 +42,12 @@ public class Archer extends AbstractUnit {
   @Override
   public void equipItem(IEquipableItem item) {
     if (!(getItems().contains(item))) {
+      List<IEquipableItem> itemsCopy = List.copyOf(getItems());
       if (addItemToInventory(item)) {
         item.equipOnArcher(this);
+        if (getEquippedItem() == null) {
+          setItemList(itemsCopy);
+        }
       }
     }
     else {

@@ -3,6 +3,8 @@ package model.units;
 import model.items.IEquipableItem;
 import model.map.Location;
 
+import java.util.List;
+
 /**
  * This class represents a fighter type unit.
  * A fighter is a unit that can only use axe type weapons.
@@ -38,8 +40,12 @@ public class Fighter extends AbstractUnit {
   @Override
   public void equipItem(final IEquipableItem item) {
     if (!(getItems().contains(item))) {
+      List<IEquipableItem> itemsCopy = List.copyOf(getItems());
       if (addItemToInventory(item)) {
         item.equipOnFighter(this);
+        if (getEquippedItem() == null) {
+          setItemList(itemsCopy);
+        }
       }
     }
     else {

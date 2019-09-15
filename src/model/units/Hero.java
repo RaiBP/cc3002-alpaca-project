@@ -9,6 +9,8 @@ import model.items.weapons.Spear;
 import model.items.weapons.Sword;
 import model.map.Location;
 
+import java.util.List;
+
 /**
  * A <i>Hero</i> is a special kind of unit, the player that defeats this unit wins the game.
  * <p>
@@ -45,8 +47,12 @@ public class Hero extends AbstractUnit {
   @Override
   public void equipItem(IEquipableItem item) {
     if (!(getItems().contains(item))) {
+      List<IEquipableItem> itemsCopy = List.copyOf(getItems());
       if (addItemToInventory(item)) {
         item.equipOnHero(this);
+        if (getEquippedItem() == null) {
+          setItemList(itemsCopy);
+        }
       }
     }
     else {

@@ -9,42 +9,42 @@ public class TestSwordMasterExchange extends AbstractTestUnit {
     @Test
     public void testExchangeEquippedItemArcher() {
         Archer otherArcher = new Archer(50, 2, field.getCell(0, 1));
-        testExchangeEquippedItem(bow, otherArcher);
+        testExchangeEquippedItem(sword, otherArcher);
     }
 
     @Test
     public void testExchangeEquippedItemCleric() {
         Cleric otherCleric = new Cleric(50, 2, field.getCell(0, 1));
-        testExchangeEquippedItem(bow, otherCleric);
+        testExchangeEquippedItem(sword, otherCleric);
     }
 
     @Test
     public void testExchangeEquippedItemSwordMaster() {
         SwordMaster otherSwordMaster = new SwordMaster(50, 2, field.getCell(0, 1));
-        testExchangeEquippedItem(bow, otherSwordMaster);
+        testExchangeEquippedItem(sword, otherSwordMaster);
     }
 
     @Test
     public void testExchangeEquippedItemFighter() {
         Fighter otherFighter = new Fighter(50, 2, field.getCell(0, 1));
-        testExchangeEquippedItem(bow, otherFighter);
+        testExchangeEquippedItem(sword, otherFighter);
     }
 
     @Test
     public void testExchangeEquippedItemHero() {
         Hero otherHero = new Hero(50, 2, field.getCell(0, 1));
-        testExchangeEquippedItem(bow, otherHero);
+        testExchangeEquippedItem(sword, otherHero);
     }
 
     @Test
     public void testExchangeEquippedItemAlpaca() {
-        testExchangeEquippedItem(bow, targetAlpaca);
+        testExchangeEquippedItem(sword, targetAlpaca);
     }
 
     @Test
     public void testExchangeEquippedItemSorcerer() {
         Sorcerer otherSorcerer = new Sorcerer(50, 2, field.getCell(0, 1));
-        testExchangeEquippedItem(bow, otherSorcerer);
+        testExchangeEquippedItem(sword, otherSorcerer);
     }
 
     @Override

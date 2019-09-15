@@ -1,5 +1,6 @@
 package model.units;
 
+import model.items.IEquipableItem;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,6 +9,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Ignacio Slater Muñoz
  */
 public class FighterTest extends AbstractTestUnit {
+
+  @Test
+  public void testEquipIncorrectItem() {
+    getTestUnit().equipItem(bow);
+    assertArrayEquals(new IEquipableItem[] {}, getTestUnit().getItems().toArray(new IEquipableItem[0]));
+  }
 
   private Fighter fighter;
 

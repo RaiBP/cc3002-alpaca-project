@@ -16,6 +16,13 @@ public class ArcherTest extends AbstractTestUnit {
   private Archer archer;
 
   @Test
+  public void testEquipIncorrectItem() {
+    getTestUnit().equipItem(axe);
+    assertArrayEquals(new IEquipableItem[] {}, getTestUnit().getItems().toArray(new IEquipableItem[0]));
+  }
+
+
+  @Test
   public void testEquipFullInventory() {
     getTestUnit().addItemToInventory(spear);
     getTestUnit().addItemToInventory(axe);

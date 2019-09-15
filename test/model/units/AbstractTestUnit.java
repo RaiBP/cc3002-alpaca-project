@@ -680,6 +680,11 @@ public abstract class AbstractTestUnit implements ITestUnit {
     testUseOnOutOfRangeTarget(item, targetAlpaca, targetHPBeforeAttack);
   }
 
+  public void testEquipIncorrectItem(IEquipableItem item) {
+    getTestUnit().equipItem(item);
+    assertArrayEquals(new IEquipableItem[] {}, getTestUnit().getItems().toArray(new IEquipableItem[0]));
+  }
+
 
 
 }

@@ -13,6 +13,12 @@ public class SwordMasterTest extends AbstractTestUnit {
   private SwordMaster swordMaster;
 
   @Test
+  public void testEquipIncorrectItem() {
+    getTestUnit().equipItem(axe);
+    assertArrayEquals(new IEquipableItem[] {}, getTestUnit().getItems().toArray(new IEquipableItem[0]));
+  }
+
+  @Test
   public void testEquipFullInventory() {
     getTestUnit().addItemToInventory(spear);
     getTestUnit().addItemToInventory(axe);
