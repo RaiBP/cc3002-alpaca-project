@@ -42,6 +42,10 @@ public class Location {
     id = "(" + row + ", " + column + ")";
   }
 
+  public Location copyOf() {
+    return new Location(getRow(), getColumn());
+  }
+
   /**
    * Checks if a location is equal to another object.
    * <p>
@@ -176,4 +180,14 @@ public class Location {
     return column;
   }
 
+  public void removeAllNeighbours() {
+    Set<Location> neighbours = getNeighbours();
+    for (Location neighbour : neighbours) {
+      removeNeighbour(neighbour);
+    }
+  }
+
+  public void setNeighbours(Set<Location> neighbours) {
+    this.neighbours = neighbours;
+  }
 }

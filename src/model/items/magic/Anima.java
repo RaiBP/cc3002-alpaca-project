@@ -28,6 +28,16 @@ public class Anima extends AbstractSpell {
         super(name, power, minRange, maxRange);
     }
 
+    /**
+     * Creates Default Anima Spell item:
+     *  - 10 Power Units
+     *  - Minimum range of 1 cell
+     *  - Maximum range of 4 cells
+     */
+    public Anima() {
+        this("Default Anima Spell", 10, 1, 4);
+    }
+
     @Override
     protected int attack(IUnit targetUnit) { return targetUnit.receiveAnimaSpellAttack(this);
     }

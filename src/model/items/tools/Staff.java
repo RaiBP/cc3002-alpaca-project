@@ -28,6 +28,16 @@ public class Staff extends AbstractTool {
     super(name, power, minRange, maxRange);
   }
 
+  /**
+   * Creates Default Staff item:
+   *  - 10 Power Units
+   *  - Minimum range of 1 cell
+   *  - Maximum range of 4 cells
+   */
+  public Staff() {
+    this("Default Staff", 10, 1, 4);
+  }
+
   @Override
   public void equipOnSwordMaster(SwordMaster swordMaster) { }
 

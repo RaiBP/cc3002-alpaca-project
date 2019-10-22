@@ -1,5 +1,7 @@
 package model.units;
 
+import model.factory.item.IItemFactory;
+import model.factory.item.LightFactory;
 import model.items.IEquipableItem;
 import model.map.Location;
 
@@ -14,6 +16,7 @@ import java.util.List;
  * @since 1.0
  */
 public class Sorcerer extends AbstractUnit {
+    private static IItemFactory lightFactory = new LightFactory();
 
     /**
      * Creates a new Sorcerer unit.
@@ -29,6 +32,16 @@ public class Sorcerer extends AbstractUnit {
      */
     public Sorcerer(final int hitPoints, final int movement, final Location position, final IEquipableItem... items) {
         super(hitPoints, movement, position, 3, items);
+    }
+
+    /**
+     * Creates default Sorcerer unit:
+     *  - 75 HP
+     *  - Max. 2 cells per move
+     *  - Default Light Spell in item list
+     */
+    public Sorcerer() {
+        this(75, 2, null, lightFactory.getDefaultItem());
     }
 
     /**

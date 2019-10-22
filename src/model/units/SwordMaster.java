@@ -1,5 +1,7 @@
 package model.units;
 
+import model.factory.item.IItemFactory;
+import model.factory.item.SwordFactory;
 import model.items.IEquipableItem;
 import model.map.Location;
 
@@ -14,6 +16,8 @@ import java.util.List;
  * @since 1.0
  */
 public class SwordMaster extends AbstractUnit {
+  private static IItemFactory swordFactory = new SwordFactory();
+
   /**
    * Creates a new SwordMaster unit.
    *
@@ -32,6 +36,16 @@ public class SwordMaster extends AbstractUnit {
   }
 
   /**
+   * Creates default SwordMaster unit:
+   *  - 75 HP
+   *  - Max. 2 cells per move
+   *  - Default Sword in item list
+   */
+  public SwordMaster() {
+    this(75, 2, null, swordFactory.getDefaultItem());
+  }
+
+    /**
    * Sets the currently equipped item of this unit.
    *
    * @param item

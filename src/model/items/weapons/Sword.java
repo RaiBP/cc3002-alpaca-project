@@ -28,6 +28,16 @@ public class Sword extends AbstractWeapon {
     super(name, power, minRange, maxRange);
   }
 
+  /**
+   * Creates Default Sword item:
+   *  - 10 Power Units
+   *  - Minimum range of 1 cell
+   *  - Maximum range of 2 cells
+   */
+  public Sword() {
+    this("Default Sword", 10, 1, 2);
+  }
+
   @Override
   protected int attack(IUnit targetUnit) {
     return targetUnit.receiveSwordAttack(this);

@@ -82,6 +82,19 @@ public class Field {
   }
 
   /**
+   * Checks whether <b>location</b> is a valid Location or not. For it to be valid, both coordinates must be different
+   * from -1.
+   * @param location
+   *     the location to be checked
+   * @return
+   *      boolean. True if both coordinates are different from -1 (i.e. <b>location</b> is valid). False if not
+   */
+  public boolean isValidLocation(Location location) {
+    Location locationResponse = getCell(location.getRow(), location.getColumn());
+    return (locationResponse.getRow() != -1) && (locationResponse.getColumn() != -1);
+  }
+
+  /**
    * Creates a map key from a row and a column
    *
    * @param row
@@ -139,5 +152,50 @@ public class Field {
    */
   public boolean checkConnection(final Location cell1, final Location cell2) {
     return cell1.isNeighbour(cell2);
+  }
+
+  public int getSize() {
+    return (int) Math.sqrt(getDimensions());
+  }
+
+  public int getDimensions() {
+    return map.size();
+  }
+
+  public void print() {
+    int size = getSize();
+    StringBuilder grid = new StringBuilder(size * (size + 1));
+
+    for (int row = 0; row < size; row++) {
+      for (int column = 0; column < size; column++) {
+        Location value = map.get(generateID(row, column));
+        if (value == null) {
+          grid.append("0");
+        }
+        else {
+          if (value.getNeighbours().size() != 0) {
+            grid.append("1");
+          } else {
+            grid.append("0");
+          }
+        }
+      }
+      grid.append('\n');
+    }
+    System.out.print(grid.toString());
+  }
+
+  public void setSeed(long seed) {
+    random =  new Random(seed);
+  }
+
+  public void setMap(Map<String, Location> mapCopy) {
+    map = mapCopy;
+  }
+
+  public Location getRandomCell() {
+    int randomRow = random.nextInt(getSize());
+    int randomColumn = random.nextInt(getSize());
+    return getCell(randomRow, randomColumn);
   }
 }

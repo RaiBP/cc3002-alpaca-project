@@ -1,5 +1,7 @@
 package model.units;
 
+import model.factory.item.IItemFactory;
+import model.factory.item.StaffFactory;
 import model.items.IEquipableItem;
 import model.map.Location;
 
@@ -13,6 +15,7 @@ import java.util.List;
  * @since 1.0
  */
 public class Cleric extends AbstractUnit {
+  private static IItemFactory staffFactory = new StaffFactory();
 
   /**
    * Creates a new Cleric unit.
@@ -29,6 +32,16 @@ public class Cleric extends AbstractUnit {
   public Cleric(final int hitPoints, final int movement, final Location location,
       IEquipableItem... items) {
     super(hitPoints, movement, location, 3, items);
+  }
+
+  /**
+   * Creates default Cleric unit:
+   *  - 50 HP
+   *  - Max. 2 cells per move
+   *  - Default Staff in item list
+   */
+  public Cleric() {
+    this(50, 2, null, staffFactory.getDefaultItem());
   }
 
   /**

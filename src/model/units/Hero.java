@@ -1,12 +1,8 @@
 package model.units;
 
+import model.factory.item.IItemFactory;
+import model.factory.item.SpearFactory;
 import model.items.IEquipableItem;
-import model.items.magic.Anima;
-import model.items.magic.Dark;
-import model.items.magic.Light;
-import model.items.weapons.Axe;
-import model.items.weapons.Spear;
-import model.items.weapons.Sword;
 import model.map.Location;
 
 import java.util.List;
@@ -20,6 +16,7 @@ import java.util.List;
  * @since 1.0
  */
 public class Hero extends AbstractUnit {
+  private static IItemFactory spearFactory = new SpearFactory();
 
   /**
    * Creates a new Hero unit.
@@ -36,6 +33,16 @@ public class Hero extends AbstractUnit {
   public Hero(final int hitPoints, final int movement, final Location location,
       IEquipableItem... items) {
     super(hitPoints, movement, location, 3, items);
+  }
+
+  /**
+   * Creates default Hero unit:
+   *  - 100 HP
+   *  - Max. 2 cells per move
+   *  - Default Spear in item list
+   */
+  public Hero() {
+    this(100, 2, null, spearFactory.getDefaultItem());
   }
 
   /**

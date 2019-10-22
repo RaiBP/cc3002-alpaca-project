@@ -253,4 +253,16 @@ public abstract class AbstractUnit implements IUnit {
     }
   }
 
+  /**
+   * Two objects can be equal regardless of their ownership
+   */
+  @Override
+  public boolean equals(Object object){
+    if (object instanceof AbstractUnit) {
+      AbstractUnit unit = (AbstractUnit) object;
+      return unit.maxHitPoints == maxHitPoints && unit.movement == movement && unit.items.equals(items);
+    }
+    return false;
+  }
+
 }

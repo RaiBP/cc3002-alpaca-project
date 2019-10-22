@@ -29,6 +29,16 @@ public class Bow extends AbstractWeapon {
     this.maxRange = Math.max(maxRange, this.minRange);
   }
 
+  /**
+   * Creates Default Bow item:
+   *  - 10 Power Units
+   *  - Minimum range of 2 cell
+   *  - Maximum range of 5 cells
+   */
+  public Bow() {
+    this("Default Bow", 10, 2, 5);
+  }
+
   @Override
   protected int attack(IUnit targetUnit) {
     return targetUnit.receiveBowAttack(this);

@@ -28,6 +28,16 @@ public class Spear extends AbstractWeapon {
     super(name, power, minRange, maxRange);
   }
 
+  /**
+   * Creates Default Spear item:
+   *  - 15 Power Units
+   *  - Minimum range of 1 cell
+   *  - Maximum range of 3 cells
+   */
+  public Spear() {
+    this("Default Spear", 15, 1, 3);
+  }
+
   @Override
   protected int attack(IUnit targetUnit) {
     return targetUnit.receiveSpearAttack(this);

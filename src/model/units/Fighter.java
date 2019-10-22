@@ -1,5 +1,7 @@
 package model.units;
 
+import model.factory.item.AxeFactory;
+import model.factory.item.IItemFactory;
 import model.items.IEquipableItem;
 import model.map.Location;
 
@@ -13,6 +15,7 @@ import java.util.List;
  * @since 1.0
  */
 public class Fighter extends AbstractUnit {
+  private static IItemFactory axeFactory = new AxeFactory();
 
   /**
    * Creates a new Fighter unit.
@@ -32,6 +35,16 @@ public class Fighter extends AbstractUnit {
   }
 
   /**
+   * Creates default Fighter unit:
+   *  - 75 HP
+   *  - Max. 2 cells per move
+   *  - Default Axe in item list
+   */
+  public Fighter() {
+    this(75, 2, null, axeFactory.getDefaultItem());
+  }
+
+    /**
    * Sets the currently equipped item of this unit.
    *
    * @param item

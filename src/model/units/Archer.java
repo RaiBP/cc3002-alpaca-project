@@ -1,5 +1,7 @@
 package model.units;
 
+import model.factory.item.BowFactory;
+import model.factory.item.IItemFactory;
 import model.items.IEquipableItem;
 import model.map.Location;
 
@@ -14,6 +16,7 @@ import java.util.List;
  * @since 1.0
  */
 public class Archer extends AbstractUnit {
+  private static IItemFactory bowFactory = new BowFactory();
 
   /**
    * Creates a new Archer unit.
@@ -29,6 +32,16 @@ public class Archer extends AbstractUnit {
    */
   public Archer(final int hitPoints, final int movement, final Location position, final IEquipableItem... items) {
     super(hitPoints, movement, position, 3, items);
+  }
+
+  /**
+   * Creates default Archer unit:
+   *  - 50 HP
+   *  - Max. 2 cells per move
+   *  - Default Bow in item list
+   */
+  public Archer() {
+    this(50, 2, null, bowFactory.getDefaultItem());
   }
 
   /**

@@ -28,6 +28,16 @@ public class Axe extends AbstractWeapon {
     super(name, power, minRange, maxRange);
   }
 
+  /**
+   * Creates Default Axe item:
+   *  - 10 Power Units
+   *  - Minimum range of 1 cell
+   *  - Maximum range of 2 cells
+   */
+  public Axe() {
+    this("Default Axe", 10, 1, 2);
+  }
+
   @Override
   protected int attack(IUnit targetUnit) {
     return targetUnit.receiveAxeAttack(this);

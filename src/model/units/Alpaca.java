@@ -35,6 +35,16 @@ public class Alpaca extends AbstractUnit {
   }
 
   /**
+  * Creates default Alpaca unit:
+  *  - 100 HP
+  *  - Max. 2 cells per move
+  *  - No default item in item list
+  */
+  public Alpaca() {
+      this(100, 2, null);
+  }
+
+    /**
    * {@inheritDoc}
    * <p>
    * The <i>Alpaca</i> cannot equip any item.
