@@ -2,6 +2,9 @@ package model.units;
 
 import static java.lang.Math.min;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,6 +38,10 @@ public abstract class AbstractUnit implements IUnit {
   private final int movement;
   protected IEquipableItem equippedItem;
   private Location location;
+  
+  private PropertyChangeSupport
+          unitDeathNotification = new PropertyChangeSupport(this),
+          heroDeathNotification = new PropertyChangeSupport(this);
 
   /**
    * Creates a new Unit.
@@ -55,6 +62,35 @@ public abstract class AbstractUnit implements IUnit {
     this.movement = movement;
     this.location = location;
     this.items.addAll(Arrays.asList(items).subList(0, min(maxItems, items.length)));
+    this.items.forEach(item -> item.setOwner(this));
+  }
+
+  public void addUnitDeathListener(PropertyChangeListener listener) {
+    this.unitDeathNotification.addPropertyChangeListener(listener);
+  }
+
+  public void removeUnitDeathListener(PropertyChangeListener listener) {
+    this.unitDeathNotification.removePropertyChangeListener(listener);
+  }
+
+  @Override
+  public void addHeroDeathListener(PropertyChangeListener listener) {
+    this.heroDeathNotification.addPropertyChangeListener(listener);
+  }
+
+  @Override
+  public void removeHeroDeathListener(PropertyChangeListener listener) {
+    this.heroDeathNotification.removePropertyChangeListener(listener);
+  }
+
+  @Override
+  public PropertyChangeSupport getUnitDeathNotification() {
+    return unitDeathNotification;
+  }
+
+  @Override
+  public PropertyChangeSupport getHeroDeathNotification() {
+    return heroDeathNotification;
   }
 
   @Override
@@ -71,7 +107,18 @@ public abstract class AbstractUnit implements IUnit {
   public boolean isAlive() { return currentHitPoints > 0; }
 
   @Override
-  public void setHitPoints(int hitPoints) { this.currentHitPoints = Math.max(0, hitPoints); }
+  public void setHitPoints(int hitPoints) {
+    hitPoints = Math.min(maxHitPoints, hitPoints);
+    this.currentHitPoints = Math.max(0, hitPoints);
+    if (this.currentHitPoints == 0) {
+      fireDeathOfUnitEvent();
+    }
+  }
+
+  public void fireDeathOfUnitEvent() {
+    unitDeathNotification.firePropertyChange(new PropertyChangeEvent(this, "Unit has died",
+            null, null));
+  }
 
   @Override
   public List<IEquipableItem> getItems() {
@@ -104,11 +151,13 @@ public abstract class AbstractUnit implements IUnit {
   }
 
   @Override
-  public void moveTo(final Location targetLocation) {
+  public boolean moveTo(final Location targetLocation) {
     if (getLocation().distanceTo(targetLocation) <= getMovement()
         && targetLocation.getUnit() == null) {
       setLocation(targetLocation);
+      return true;
     }
+    return false;
   }
 
   @Override

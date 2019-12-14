@@ -1,9 +1,10 @@
 package controller;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
 
+import handlers.MovedUnitHandler;
+import handlers.RetiringTacticianHandler;
 import model.Tactician;
 import model.items.IEquipableItem;
 import model.map.Field;
@@ -14,21 +15,28 @@ import model.units.IUnit;
  * Controller of the game.
  * The controller manages all the input received from de game's GUI.
  *
- * @author Ignacio Slater Muñoz
+ * @author Raimundo Becerra Parra
  * @version 2.0
  * @since 2.0
  */
-public class GameController implements PropertyChangeListener {
+public class GameController {
     private List<Tactician> tacticians = new ArrayList<>();
-    private Map<Location, Tactician> locationTacticianMap = new HashMap<>();
+    private List<String> winners = new ArrayList<>();
+    private Map<Location, Tactician> assignedCells = new HashMap<>();
     private Field field = new Field();
     private Tactician turnOwner;
     private long seed;
-    private int[] turnOrder;
+    private List<String> turnOrder;
     private int turnNumber;
     private int roundNumber;
     private int maxRounds;
+    private int numberOfPlayers;
+    private boolean firstGame = true;
+    private boolean currentGameFinished = false;
+    private boolean currentGameStarted = false;
 
+    private PropertyChangeListener retiringTacticianHandler = new RetiringTacticianHandler(this),
+            movedUnitHandler = new MovedUnitHandler(this);
     /**
      * Creates the controller for a new game.
      *
@@ -39,24 +47,64 @@ public class GameController implements PropertyChangeListener {
         this(numberOfPlayers, mapSize, new Random().nextLong());
     }
 
+    /**
+     * Creates the controller for a new game, with specific seed.
+     *
+     * @param numberOfPlayers the number of players for this game
+     * @param mapSize         the dimensions of the map, for simplicity, all maps are squares
+     * @param seed            the seed to be used in random experiments
+     */
     public GameController(int numberOfPlayers, int mapSize, long seed) {
+        this.numberOfPlayers = numberOfPlayers;
+
         setSeed(seed);
         field.setSeed(seed);
         generateMap(mapSize);
+
         generateTacticians(numberOfPlayers);
         initTurnOrder();
-        asignCells();
+        assignCells();
         initUnits();
+        turnOwner = getTacticianByName(getTurnOrder().get(0));
+        turnNumber = 0;
+        roundNumber = 0;
     }
 
-    public List<Location> getTacticianCellsByIndex(int index) {
-        Tactician tactician = tacticians.get(index);
-        return getTacticianCells(tactician);
+    private void subscribeToRetiringTacticianNotification(Tactician tactician) {
+        tactician.addRetiringTacticianListener(retiringTacticianHandler);
     }
 
+    private void unsubscribeToRetiringTacticianNotification(Tactician tactician) {
+        tactician.removeRetiringTacticianListener(retiringTacticianHandler);
+    }
+
+    private void subscribeToMovedUnitNotification(Tactician tactician) {
+        tactician.addMovedUnitListener(movedUnitHandler);
+    }
+
+    private void unsubscribeToMovedUnitNotification(Tactician tactician) {
+        tactician.removeMovedUnitListener(movedUnitHandler);
+    }
+
+    private void subscribeToAllNotifications(Tactician tactician) {
+        subscribeToMovedUnitNotification(tactician);
+        subscribeToRetiringTacticianNotification(tactician);
+    }
+
+    private void unsubscribeToAllNotifications(Tactician tactician) {
+        unsubscribeToMovedUnitNotification(tactician);
+        unsubscribeToRetiringTacticianNotification(tactician);
+    }
+
+    /**
+     * Getter for cells in the GameMap that have units corresponding to the specified <b>tactician</b>.
+     *
+     * @param tactician         the tactician from whom to extract the cells
+     * @return                  list of cells that have units corresponding to specified <b>tactician</b>
+     */
     public List<Location> getTacticianCells(Tactician tactician) {
         List<Location> cells = new ArrayList<>();
-        locationTacticianMap.forEach((k, val) -> {
+        assignedCells.forEach((k, val) -> {
             if (val.equals(tactician)) {
                 cells.add(k);
             }
@@ -64,34 +112,66 @@ public class GameController implements PropertyChangeListener {
         return cells;
     }
 
+    /**
+     * Getter for cells in the GameMap that have units corresponding to the <b>TurnOwner</b>.
+     *
+     * @return                  list of cells that have units corresponding to the <b>TurnOwner</b>
+     */
     public List<Location> getTurnOwnerCells() {
         return getTacticianCells(turnOwner);
     }
 
-    private void asignCells() {
-        int assignedCells = 0;
-        int cellsPerPlayer = field.getDimensions() / numberOfPlayers();
-        int assignableCells = cellsPerPlayer * numberOfPlayers();
-        while (assignedCells < assignableCells) {
-            int playerNumber = assignedCells / cellsPerPlayer;
+    private void assignCells() {
+        // to be implemented in 3.0
+        // placeholder for current version: each Tactician will get ONE random cell each
+
+        for (Tactician tactician : tacticians) {
             Location randomCell = field.getRandomCell();
-            Tactician tactician = locationTacticianMap.get(randomCell);
-            if (tactician == null) {
-                locationTacticianMap.put(randomCell, tacticians.get(playerNumber));
-                assignedCells++;
+
+            while (assignedCells.get(randomCell) != null) {
+                randomCell = field.getRandomCell();
             }
+
+            assignedCells.put(randomCell, tactician);
         }
     }
 
-
     private void initUnits() {
-        while (!maxTurnsReached()) {
-            getTurnOwner().positionUnits();
+        for (int j = 0; j < getNumberOfPlayers(); j++) {
+            getTurnOwner().positionUnits(getTurnOwnerCells());
             endTurn();
         }
     }
 
-    // TODO: poner este metodo en Field
+    /**
+     * Sets the location of the <b>tactician</b>'s unit corresponding to the index <b>unitIndex</b> to <b>cell</b>.
+     */
+    public void setUnitPositionByIndexIn(Tactician tactician, int unitIndex, Location cell) {
+        IUnit unit = tactician.getUnitByIndex(unitIndex);
+        if (cell != null) {
+            IUnit previousUnitInCell = cell.getUnit();
+            if (previousUnitInCell != null) {
+                previousUnitInCell.setLocation(null);
+            }
+            cell.setUnit(unit);
+            assignedCells.put(cell, tactician);
+        }
+        unit.setLocation(cell);
+    }
+
+    /**
+     * Removes <b>unit</b> from the <b>tactician</b>.
+     */
+    public void removeUnitFromTactician(Tactician tactician, IUnit unit) {
+        assignedCells.remove(unit.getLocation());
+        tactician.removeUnit(unit);
+        for (Location cell : getTurnOwnerCells()) {
+            if (cell.getUnit() == unit) {
+                cell.setUnit(null);
+            }
+        }
+    }
+
     private void generateMap(int mapSize) {
         List<Location> cells = new ArrayList<>();
         for (int row = 0; row < mapSize; row++) {
@@ -102,14 +182,19 @@ public class GameController implements PropertyChangeListener {
         field.addCells(false, cells.toArray(new Location[cells.size()]));
     }
 
+    /**
+     * Sets the seed to be used in random experiments.
+     */
     public void setSeed(long seed) {
         this.seed = seed;
     }
 
     private void generateTacticians(int numberOfPlayers) {
+        tacticians = new ArrayList<>();
         for (int playerNumber = 0; playerNumber < numberOfPlayers; playerNumber++) {
-            tacticians.add(new Tactician("Player " + playerNumber));
-            tacticians.get(playerNumber).setField(field);
+            Tactician tactician = new Tactician("Player " + playerNumber);
+            tactician.setField(field);
+            tacticians.add(tactician);
         }
     }
 
@@ -152,25 +237,38 @@ public class GameController implements PropertyChangeListener {
      * Finishes the current player's turn.
      */
     public void endTurn() {
-        if (maxTurnsReached()) {
-            startNewRound();
+        if (currentGameFinished) {
+            return;
+        }
 
-            if (maxRoundsReached()) {
-                endGame();
+        if (getTurnOwner().getHeroStatus()) {
+            removeTactician(getTurnOwner().getName());
+        }
+
+        if (maxTurnsReached()) {
+            if (currentGameStarted){
+                startNewRound();
+
+                if (maxRoundsReached()) {
+                    endGame();
+                }
             }
         }
         else {
             setNewTurnOwner();
+            turnNumber++;
         }
-        turnNumber++;
+        getTurnOwner().setSelectedUnit(null);
+        getTurnOwner().resetMovedUnits();
+
     }
 
     private boolean maxTurnsReached() {
-        return turnNumber >= numberOfPlayers();
+        return turnNumber >= getNumberOfPlayers() - 1;
     }
 
     private boolean maxRoundsReached() {
-        return maxRounds > 0 && (roundNumber - 1 > maxRounds);
+        return maxRounds > 0 && (roundNumber >= maxRounds + 1);
     }
 
     private void startNewRound() {
@@ -179,7 +277,29 @@ public class GameController implements PropertyChangeListener {
         roundNumber++;
     }
 
-    private void endGame() {
+    /**
+     * Finishes a game started by the initGame method. Winners will be selected in this method.
+     */
+    public void endGame() {
+        int currentMax = 0;
+        List<String> currentWinners = new ArrayList<>();
+        for (Tactician tactician : tacticians) {
+            int numberOfUnits = tactician.getNumberOfUnits();
+            if (numberOfUnits >= currentMax) {
+                currentMax = numberOfUnits;
+                currentWinners.add(tactician.getName());
+            }
+        }
+        winners = currentWinners;
+        currentGameFinished = true;
+        currentGameStarted = false;
+    }
+
+    /**
+     * Getter for boolean indicating whether the game started by initGame has finished.
+     */
+    public boolean isCurrentGameFinished() {
+        return currentGameFinished;
     }
 
     /**
@@ -194,27 +314,18 @@ public class GameController implements PropertyChangeListener {
                     removeTacticianFromTurnOrder(otherTactician);
                 }
                 tacticians.remove(otherTactician);
+                otherTactician.removeAllCurrentUnits();
+                unsubscribeToAllNotifications(otherTactician);
+                if (getNumberOfPlayers() == 1) {
+                    endGame();
+                }
                 return;
             }
         }
     }
 
     private void removeTacticianFromTurnOrder(Tactician tactician) {
-        int tacticianIndex = tacticians.indexOf(tactician);
-        int[] newTurnArray = new int[numberOfPlayers() - 1];
-
-        int newIndex = 0;
-        for (int oldIndex = 0; oldIndex < numberOfPlayers(); oldIndex++) {
-            if (turnOrder[oldIndex] != tacticianIndex) {
-                newTurnArray[newIndex] = turnOrder[oldIndex];
-                if (turnOrder[oldIndex] > tacticianIndex) {
-                    newTurnArray[newIndex]--;
-                }
-                newIndex++;
-            }
-        }
-
-        turnOrder = newTurnArray;
+        turnOrder.remove(tactician.getName());
     }
 
     /**
@@ -223,14 +334,66 @@ public class GameController implements PropertyChangeListener {
      * @param maxTurns the maximum number of turns the game can last
      */
     public void initGame(final int maxTurns) {
-        setMaxRounds(maxTurns);
-        setRoundNumber(1);
+        if (getNumberOfPlayers() == 1) {
+            endGame();
+        }
+        else {
+            currentGameStarted = true;
+            if (!firstGame) {
+                currentGameFinished = false;
+                generateTacticians(numberOfPlayers);
+                initTurnOrder();
+                clearField();
+                assignCells();
+                initUnits();
+            }
+            turnOwner = getTacticianByName(turnOrder.get(0));
+            turnOwner.setIsTurnOwner(true);
+            tacticians.forEach(Tactician::resetMovedUnits);
+            tacticians.forEach(this::subscribeToAllNotifications);
+            currentGameFinished = false;
+            currentGameStarted = true;
+            firstGame = false;
+            setMaxRounds(maxTurns);
+            setRoundNumber(1);
+            setTurnNumber(0);
+            winners = new ArrayList<>();
+        }
+    }
+
+    private void clearField() {
+        List<Location> cells = new ArrayList<>(assignedCells.keySet());
+        for (Location cell : cells) {
+            cell.setUnit(null);
+        }
+        assignedCells = new HashMap<>();
+    }
+
+    /**
+     * Getter for cells in the GameMap that haven't got units associated to them.
+     *
+     * @return                  list of cells that don't have units associated to them
+     */
+    public List<Location> getUnassignedCells() {
+        int size = field.getSize();
+        List<Location> freeCells = new ArrayList<>();
+
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                Location cell = field.getCell(row, col);
+                if (!assignedCells.containsKey(cell)) {
+                    freeCells.add(cell);
+                }
+            }
+        }
+        return freeCells;
     }
 
     private void initTurnOrder() {
         initTurnOrderArray();
-        setTurnNumber(0);
+        setTurnNumber(-1);
         setNewTurnOwner();
+        turnNumber++;
     }
 
     private void setMaxRounds(int maxRounds) {
@@ -238,7 +401,11 @@ public class GameController implements PropertyChangeListener {
     }
 
     private void setNewTurnOwner() {
-        turnOwner = tacticians.get(turnOrder[turnNumber]);
+        if (turnOwner != null) {
+            turnOwner.setIsTurnOwner(false);
+        }
+        turnOwner = getTacticianByName(turnOrder.get(turnNumber + 1));
+        turnOwner.setIsTurnOwner(true);
     }
 
     private void setTurnNumber(int turnNumber) {
@@ -249,38 +416,26 @@ public class GameController implements PropertyChangeListener {
         this.roundNumber = roundNumber;
     }
 
-    // TODO: cambiar array por ArrayList y usar método shuffle (no necesito testearlo)
     private void initTurnOrderArray() {
-        Random random = new Random(seed);
-        int size = numberOfPlayers();
-        int[] array = new int[size];
+        List<String> array = new ArrayList<>();
 
-        for (int i = 0; i < size; i++) {
-            array[i] = i;
-        }
+        getTacticians().forEach(tactician -> array.add(tactician.getName()));
 
-        for (int i = 0; i < array.length; i++) {
-            int randomPosition = random.nextInt(array.length);
-            int temp = array[i];
-            array[i] = array[randomPosition];
-            array[randomPosition] = temp;
-        }
+        Collections.shuffle(array, new Random(seed));
 
-        if (turnRepetition(array[0])) {
-            int temp = array[0];
-            array[0] = array[1];
-            array[1] = temp;
+        if (turnRepetition(array.get(0)) && array.size() > 1) {
+            Collections.swap(array, 0, 1);
         }
 
         turnOrder = array;
     }
 
-    private boolean turnRepetition(int nextTurn) {
+    private boolean turnRepetition(String nextTurn) {
         if (turnOrder == null) {
             return false;
         }
-        int lastTurn = turnOrder[turnOrder.length - 1];
-        return lastTurn == nextTurn;
+        String lastTurn = turnOrder.get(turnOrder.size() -1);
+        return lastTurn.equals(nextTurn);
     }
 
     /**
@@ -294,7 +449,7 @@ public class GameController implements PropertyChangeListener {
      * @return the winner of this game, if the match ends in a draw returns a list of all the winners
      */
     public List<String> getWinners() {
-        return null;
+        return winners;
     }
 
     /**
@@ -327,6 +482,9 @@ public class GameController implements PropertyChangeListener {
      * @param index the location of the item in the inventory.
      */
     public void equipItem(int index) {
+        if (getItems().size() <= index) {
+            return;
+        }
         IEquipableItem item = getItems().get(index);
         turnOwner.equipItemToSelectedUnit(item);
     }
@@ -350,8 +508,13 @@ public class GameController implements PropertyChangeListener {
      * @param index the location of the item in the inventory.
      */
     public void selectItem(int index) {
-        IEquipableItem item = getItems().get(index);
-        turnOwner.selectItem(item);
+        if (getItems().size() <= index) {
+            turnOwner.selectItem(null);
+        }
+        else {
+            IEquipableItem item = getItems().get(index);
+            turnOwner.selectItem(item);
+        }
     }
 
     /**
@@ -367,25 +530,155 @@ public class GameController implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Adds an <b>item</b> to the selected unit's inventory.
+     *
+     * @param item    item to be added to the selected unit's inventory
+     */
     public void addItemToSelectedUnitInventory(IEquipableItem item) {
         getSelectedUnit().addItemToInventory(item);
     }
 
-    public int numberOfPlayers() {
+    /**
+     * @return  current number of players (tacticians) in the game
+     */
+    public int getNumberOfPlayers() {
         return tacticians.size();
     }
 
-    public Tactician getNextTurnOwner() {
-        if (turnNumber + 1 < numberOfPlayers()) {
-            return getTacticians().get(turnOrder[turnNumber + 1]);
-        }
-        else {
-            return null;
-        }
+    /**
+     * Adds a <b>Default Fighter</b> to the <b>Turn Owner's</b> list of units.
+     */
+    public void addFighterToTurnOwner() {
+        this.getTurnOwner().addFighter();
     }
 
-    @Override
-    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-
+    /**
+     * Adds a <b>Default Archer</b> to the <b>Turn Owner's</b> list of units.
+     */
+    public void addArcherToTurnOwner() {
+        this.getTurnOwner().addArcher();
     }
+
+    /**
+     * Adds a <b>Default Fighter</b> to the <b>Turn Owner's</b> list of units.
+     */
+    public void addClericToTurnOwner() {
+        this.getTurnOwner().addCleric();
+    }
+
+    /**
+     * Adds a <b>Default Sorcerer</b> to the <b>Turn Owner's</b> list of units.
+     */
+    public void addSorcererToTurnOwner() {
+        this.getTurnOwner().addSorcerer();
+    }
+
+    /**
+     * Adds a <b>Default Sword Master</b> to the <b>Turn Owner's</b> list of units.
+     */
+    public void addSwordMasterToTurnOwner() {
+        this.getTurnOwner().addSwordMaster();
+    }
+
+    /**
+     * Adds a <b>Default Alpaca</b> to the <b>Turn Owner's</b> list of units.
+     */
+    public void addAlpacaToTurnOwner() {
+        this.getTurnOwner().addAlpaca();
+    }
+
+    /**
+     * Adds a <b>Default Hero</b> to the <b>Turn Owner's</b> list of units.
+     */
+    public void addHeroToTurnOwner() {
+        this.getTurnOwner().addHero();
+    }
+
+    /**
+     * Selects unit from the <b>Turn Owner</b>'s list of units in the position <b>unitIndex</b>.
+     */
+    public void selectTurnOwnerUnitByIndex(int unitIndex) {
+        this.getTurnOwner().selectUnitByIndex(unitIndex);
+    }
+
+    /**
+     * @return tactician named <b>tacticianName</b>
+     */
+    public Tactician getTacticianByName(String tacticianName) {
+        for (Tactician tactician : tacticians) {
+            if (tactician.getName().equals(tacticianName)) {
+                return tactician;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Adds a <b>Default Fighter</b> to the <b>tactician's</b> list of units.
+     */
+    public void addFighterToTactician(Tactician tactician) {
+        tactician.addFighter();
+    }
+
+    /**
+     * Adds a <b>Default Hero</b> to the <b>tactician's</b> list of units.
+     */
+    public void addHeroToTactician(Tactician tactician) {
+        tactician.addHero();
+    }
+
+    /**
+     * Adds a <b>Default Sword Master</b> to the <b>tactician's</b> list of units.
+     */
+    public void addSwordMasterToTactician(Tactician tactician) {
+        tactician.addSwordMaster();
+    }
+
+    /**
+     * Adds a <b>Default Cleric</b> to the <b>tactician's</b> list of units.
+     */
+    public void addClericToTactician(Tactician tactician) {
+        tactician.addCleric();
+    }
+
+    /**
+     * Adds a <b>Default Alpaca</b> to the <b>tactician's</b> list of units.
+     */
+    public void addAlpacaToTactician(Tactician tactician) {
+        tactician.addAlpaca();
+    }
+
+    /**
+     * Adds a <b>Default Archer</b> to the <b>tactician's</b> list of units.
+     */
+    public void addArcherToTactician(Tactician tactician) {
+        tactician.addArcher();
+    }
+
+    /**
+     * Adds a <b>Default Sorcerer</b> to the <b>tactician's</b> list of units.
+     */
+    public void addSorcererToTactician(Tactician tactician) {
+        tactician.addSorcerer();
+    }
+
+
+    /**
+     * Getter for the player order. Only the names of the tacticians are stored. The corresponding list indexes
+     * represent the player order,from 0 (the first to play) to the number of players - 1 (the last to play).
+     * @return list that contains the player order for the current round.
+     */
+    public List<String> getTurnOrder() {
+        return turnOrder;
+    }
+
+    /**
+     * Deletes the reference to the specified <b>cell</b> in the assigned cells HashMap.
+     */
+    public void unassignCell(Location cell) {
+        assignedCells.remove(cell);
+    }
+
+
 }

@@ -53,6 +53,10 @@ public class SwordMaster extends AbstractUnit {
    */
   @Override
   public void equipItem(IEquipableItem item) {
+    if (item == null) {
+      equippedItem = null;
+      return;
+    }
     if (!(getItems().contains(item))) {
       List<IEquipableItem> itemsCopy = List.copyOf(getItems());
       if (addItemToInventory(item)) {

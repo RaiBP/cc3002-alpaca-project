@@ -5,6 +5,8 @@ import model.factory.item.SpearFactory;
 import model.items.IEquipableItem;
 import model.map.Location;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeSupport;
 import java.util.List;
 
 /**
@@ -45,6 +47,12 @@ public class Hero extends AbstractUnit {
     this(100, 2, null, spearFactory.getDefaultItem());
   }
 
+  @Override
+  public void fireDeathOfUnitEvent() {
+    getHeroDeathNotification().firePropertyChange(new PropertyChangeEvent(this, "Hero has died",
+            null, null));
+  }
+
   /**
    * Sets the currently equipped item of this unit.
    *
@@ -53,6 +61,10 @@ public class Hero extends AbstractUnit {
    */
   @Override
   public void equipItem(IEquipableItem item) {
+    if (item == null) {
+      equippedItem = null;
+      return;
+    }
     if (!(getItems().contains(item))) {
       List<IEquipableItem> itemsCopy = List.copyOf(getItems());
       if (addItemToInventory(item)) {

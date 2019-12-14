@@ -1,5 +1,7 @@
 package model.units;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.List;
 import model.items.IEquipableItem;
 import model.items.magic.Anima;
@@ -29,6 +31,7 @@ public interface IUnit {
    *     the item to equip
    */
   void equipItem(IEquipableItem item);
+
 
   /**
    * @return maximum hit points of the unit
@@ -88,8 +91,9 @@ public interface IUnit {
    * Moves this unit to another location.
    * <p>
    * If the other location is out of this unit's movement range, the unit doesn't move.
+   * @return true if unit was moved successfully, false if not
    */
-  void moveTo(Location targetLocation);
+  boolean moveTo(Location targetLocation);
 
   /**
    * @param axe
@@ -181,13 +185,47 @@ public interface IUnit {
 
   /**
    * Sets <b>list</b> as the unit's new inventory list
-   * @param list
+   * @param list      list of items
    */
   void setItemList(List<IEquipableItem> list);
 
   /**
-   * Performs a combat between the unit and <b>targetUnit</b>
-   * @param targetUnit
+   * Performs combat between the unit and <b>targetUnit</b>
+   * @param targetUnit    unit whom to perform combat to
    */
   void doCombat(IUnit targetUnit);
+
+  /**
+   * Adds listener to unit death notification
+   * @param listener    notification listener
+   */
+  void addUnitDeathListener(PropertyChangeListener listener);
+
+  /**
+   * Removes listener from unit death notification
+   * @param listener    notification listener
+   */
+  void removeUnitDeathListener(PropertyChangeListener listener);
+
+  /**
+   * Adds listener to Hero death notification
+   * @param listener    notification listener
+   */
+  void addHeroDeathListener(PropertyChangeListener listener);
+
+  /**
+   * Remove listener from Hero death notification
+   * @param listener    notification listener
+   */
+  void removeHeroDeathListener(PropertyChangeListener listener);
+
+  /**
+   * @return unit death notification object
+   */
+  PropertyChangeSupport getUnitDeathNotification();
+
+  /**
+   * @return hero death notification object
+   */
+  PropertyChangeSupport getHeroDeathNotification();
 }

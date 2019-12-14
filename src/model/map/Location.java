@@ -42,10 +42,6 @@ public class Location {
     id = "(" + row + ", " + column + ")";
   }
 
-  public Location copyOf() {
-    return new Location(getRow(), getColumn());
-  }
-
   /**
    * Checks if a location is equal to another object.
    * <p>
@@ -56,7 +52,6 @@ public class Location {
    *     the object to compare this location to
    * @return <code>true</code> if the id's match; <code>false</code> otherwise
    */
-
   @Override
   public boolean equals(final Object other) {
     return other instanceof Location && row == ((Location) other).row
@@ -180,14 +175,4 @@ public class Location {
     return column;
   }
 
-  public void removeAllNeighbours() {
-    Set<Location> neighbours = getNeighbours();
-    for (Location neighbour : neighbours) {
-      removeNeighbour(neighbour);
-    }
-  }
-
-  public void setNeighbours(Set<Location> neighbours) {
-    this.neighbours = neighbours;
-  }
 }

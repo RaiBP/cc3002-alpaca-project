@@ -154,45 +154,30 @@ public class Field {
     return cell1.isNeighbour(cell2);
   }
 
+  /**
+   * @return length of one side of the map, assuming the map is a square
+   */
   public int getSize() {
     return (int) Math.sqrt(getDimensions());
   }
 
+  /**
+   * @return total area of the map
+   */
   public int getDimensions() {
     return map.size();
   }
 
-  public void print() {
-    int size = getSize();
-    StringBuilder grid = new StringBuilder(size * (size + 1));
-
-    for (int row = 0; row < size; row++) {
-      for (int column = 0; column < size; column++) {
-        Location value = map.get(generateID(row, column));
-        if (value == null) {
-          grid.append("0");
-        }
-        else {
-          if (value.getNeighbours().size() != 0) {
-            grid.append("1");
-          } else {
-            grid.append("0");
-          }
-        }
-      }
-      grid.append('\n');
-    }
-    System.out.print(grid.toString());
-  }
-
+  /**
+   * Setter for the seed which will be used for the random experiments.
+   */
   public void setSeed(long seed) {
     random =  new Random(seed);
   }
 
-  public void setMap(Map<String, Location> mapCopy) {
-    map = mapCopy;
-  }
-
+  /**
+   * @return random cell
+   */
   public Location getRandomCell() {
     int randomRow = random.nextInt(getSize());
     int randomColumn = random.nextInt(getSize());
